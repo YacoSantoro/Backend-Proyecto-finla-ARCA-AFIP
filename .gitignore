@@ -1,0 +1,16 @@
+target/
+data/
+*.iml
+.idea/
+.vscode/
+
+# NUNCA subir la clave privada ni los certificados
+certificados/*
+!certificados/LEEME.md
+*.key
+*.crt
+*.pem
+*.csr
+*.p12
+*.pfx
+ticket-*.properties
