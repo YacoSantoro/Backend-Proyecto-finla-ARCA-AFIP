@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Facturas de venta</title>
+  <link rel="stylesheet" href="css/estilos.css">
+</head>
+<body>
+  <header class="barra">
+    <h1>Facturas de venta</h1>
+    <span id="modo-arca" class="chip"></span>
+    <a class="btn primario" href="factura.html">+ Nueva factura</a>
+  </header>
+
+  <main>
+    <!-- Filtros de busqueda -->
+    <form id="filtros" class="tarjeta filtros">
+      <label>Nro factura
+        <input name="numero" type="number" min="1" placeholder="Ej: 8">
+      </label>
+      <label>Fecha desde
+        <input name="fechaDesde" type="date">
+      </label>
+      <label>Fecha hasta
+        <input name="fechaHasta" type="date">
+      </label>
+      <label>Cliente
+        <input name="cliente" type="search" placeholder="Razón social">
+      </label>
+      <label>Informada a ARCA
+        <select name="informada">
+          <option value="">Todas</option>
+          <option value="true">Sí, informadas</option>
+          <option value="false">No, pendientes</option>
+        </select>
+      </label>
+      <div class="botones">
+        <button class="btn primario" type="submit">Buscar</button>
+        <button class="btn" type="reset">Limpiar</button>
+      </div>
+    </form>
+
+    <div id="mensaje" class="mensaje" hidden></div>
+
+    <!-- Grilla paginada -->
+    <section class="tarjeta">
+      <div class="tabla-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>Tipo</th><th>Número</th><th>Fecha</th><th>Cliente</th>
+              <th class="der">Total</th><th>Estado</th><th>CAE</th><th></th>
+            </tr>
+          </thead>
+          <tbody id="grilla-cuerpo"></tbody>
+        </table>
+      </div>
+      <footer class="paginador">
+        <button id="btn-anterior" class="btn" type="button">‹ Anterior</button>
+        <span id="info-pagina"></span>
+        <button id="btn-siguiente" class="btn" type="button">Siguiente ›</button>
+      </footer>
+    </section>
+  </main>
+
+  <script type="module" src="js/listado.js"></script>
+</body>
+</html>

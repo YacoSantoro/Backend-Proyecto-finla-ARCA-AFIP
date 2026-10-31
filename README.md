@@ -10,7 +10,7 @@ TP final: CRUD de **Factura de Venta** con front HTML + TypeScript, back Spring 
 | Una vez informada a ARCA se bloquea la modificación | `FacturaService.verificarQueNoEsteInformada()` + `factura.ts aplicarBloqueo()` |
 | Conexión ARCA/AFIP | paquete `arca/` (WSAA + WSFEv1) |
 
-El front está en la carpeta hermana `../Frontend-Proyecto-final-ARCA-AFIP`.
+El front está en la carpeta [`frontend/`](frontend/) de este mismo repo.
 
 ---
 
@@ -62,7 +62,7 @@ Backend (en esta carpeta):
 mvn spring-boot:run
 ```
 
-Frontend (en `../Frontend-Proyecto-final-ARCA-AFIP`):
+Frontend (en la carpeta `frontend/`):
 
 ```bash
 npm install
@@ -166,7 +166,7 @@ Piezas:
 - `ManejadorErrores`: convierte cada excepción en `{ "mensaje": "...", "detalles": [...] }` con su código (404, 409, 422, 502). El front siempre sabe dónde leer el error.
 - `CorsConfig`: permite que la página en `localhost:5500` llame al back en `localhost:8080`.
 
-### El front (`../Frontend-Proyecto-final-ARCA-AFIP`)
+### El front (`frontend/`)
 - `src/*.ts` se compila a `js/*.js` con `npm run build` (TypeScript es JavaScript con tipos; el navegador solo entiende JS).
 - `api.ts`: **el único que hace `fetch`**. Las pantallas llaman a `buscarFacturas()`, `crearFactura()`, etc.
 - `listado.ts` (`index.html`): filtros → `buscarFacturas(filtro, pagina)` → dibuja filas. Si la factura está informada, solo muestra "Ver".

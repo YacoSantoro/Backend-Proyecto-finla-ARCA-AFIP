@@ -1,0 +1,15 @@
+{
+  "name": "frontend-factura-venta-arca",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Front HTML + TypeScript del CRUD de Factura de Venta con ARCA",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc --watch",
+    "start": "http-server . -p 5500 -c-1 -o /index.html"
+  },
+  "devDependencies": {
+    "http-server": "14.1.1",
+    "typescript": "5.6.3"
+  }
+}

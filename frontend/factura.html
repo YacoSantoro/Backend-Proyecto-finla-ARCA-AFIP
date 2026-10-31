@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Factura de venta</title>
+  <link rel="stylesheet" href="css/estilos.css">
+</head>
+<body>
+  <header class="barra">
+    <a class="btn" href="index.html">‹ Volver</a>
+    <h1 id="titulo">Nueva factura</h1>
+  </header>
+
+  <main>
+    <div id="mensaje" class="mensaje" hidden></div>
+    <div id="panel-arca" class="panel-arca" hidden></div>
+
+    <form id="form-factura">
+      <section class="tarjeta cabecera">
+        <label>Tipo de comprobante
+          <select id="tipo">
+            <option value="11">Factura C (monotributo)</option>
+            <option value="6">Factura B</option>
+            <option value="1">Factura A</option>
+          </select>
+        </label>
+        <label>Fecha
+          <input id="fecha" type="date" required>
+        </label>
+        <label class="ancho">Cliente
+          <span class="con-boton">
+            <input id="cliente-texto" type="text" readonly placeholder="Elegí un cliente →">
+            <button id="btn-buscar-cliente" class="btn" type="button">Buscar…</button>
+          </span>
+          <small id="cliente-detalle" class="ayuda"></small>
+        </label>
+        <label>Lista de precios
+          <select id="lista"></select>
+        </label>
+      </section>
+
+      <section class="tarjeta">
+        <div class="titulo-seccion">
+          <h2>Artículos</h2>
+          <button id="btn-agregar" class="btn" type="button">+ Agregar artículo…</button>
+        </div>
+        <div class="tabla-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th>Código</th><th>Descripción</th><th>Cantidad</th>
+                <th class="der">Precio</th><th class="der">IVA</th><th class="der">Subtotal</th><th></th>
+              </tr>
+            </thead>
+            <tbody id="items-cuerpo"></tbody>
+          </table>
+        </div>
+        <p class="total">Total <strong id="total">$ 0,00</strong></p>
+      </section>
+
+      <div class="botones fin">
+        <button id="btn-informar" class="btn" type="button" hidden>Informar a ARCA</button>
+        <button id="btn-guardar" class="btn primario" type="submit">Guardar</button>
+      </div>
+    </form>
+  </main>
+
+  <script type="module" src="js/factura.js"></script>
+</body>
+</html>
