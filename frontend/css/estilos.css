@@ -40,7 +40,7 @@ input:disabled, select:disabled { background: #f0f1f3; }
 .filtros, .cabecera { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); align-items: end; }
 .cabecera .ancho { grid-column: span 2; }
 .con-boton { display: flex; gap: 6px; }
-.con-boton input { flex: 1; }
+.con-boton input, .con-boton select { flex: 1; min-width: 0; }
 .botones { display: flex; gap: 8px; }
 .botones.fin { justify-content: flex-end; }
 

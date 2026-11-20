@@ -161,10 +161,20 @@ export function informarFactura(id: number) {
   return pedir<Factura>(`/facturas/${id}/informar`, { method: "POST" });
 }
 
+/** URL del ticket PDF (se abre en otra pestaña para imprimir). */
+export function urlTicketPdf(id: number): string {
+  return `${API}/facturas/${id}/ticket`;
+}
+
 // ---------- Exploradores ----------
 
 export function buscarClientes(texto: string, pagina: number) {
   return pedir<Pagina<Cliente>>("/clientes" + queryString({ texto, pagina, tamanio: 8 }));
+}
+
+/** Todos los clientes (hasta 100) para el desplegable de la factura. */
+export function todosLosClientes() {
+  return pedir<Pagina<Cliente>>("/clientes" + queryString({ pagina: 0, tamanio: 100 }));
 }
 
 export function listasDePrecio() {

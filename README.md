@@ -180,3 +180,11 @@ mvn test
 - `CalculadoraImportesTest`: las cuentas de IVA.
 - `WsfeXmlTest`: el XML que mandamos y cómo leemos respuestas aprobadas, rechazadas y con error (sin internet).
 - `FacturaServiceTest`: crear, modificar, borrar, **bloqueo al informar** y filtros (base en memoria + ARCA simulado).
+
+## Ticket PDF para imprimir
+
+- Endpoint: `GET /api/facturas/{id}/ticket` → PDF de 80 mm (sirve para térmica o impresora común), con CAE, vencimiento y el **QR de ARCA**.
+- Solo funciona con facturas **informadas** (si no, responde 422).
+- En el front: botón **🖨 Ticket PDF** en el listado y **🖨 Imprimir ticket (PDF)** en el detalle. Abre el PDF en otra pestaña y se imprime desde ahí.
+- Los datos del comercio (razón social, domicilio, etc.) se configuran en `application.properties` con las claves `emisor.*`.
+- Código: `src/main/java/ar/edu/utn/facturacion/pdf/` (OpenPDF + ZXing).

@@ -1,6 +1,6 @@
 // Pantalla 1: grilla de facturas con filtros y paginacion.
 
-import { buscarFacturas, eliminarFactura, estadoArca, FacturaResumen, FiltroFactura, informarFactura } from "./api.js";
+import { buscarFacturas, eliminarFactura, estadoArca, FacturaResumen, FiltroFactura, informarFactura, todosLosClientes, urlTicketPdf } from "./api.js";
 import { $, dinero, fecha, html, nroComprobante, tipoComprobante } from "./formato.js";
 
 const TAMANIO_PAGINA = 10;
@@ -13,6 +13,21 @@ const infoPagina = $<HTMLSpanElement>("info-pagina");
 const btnAnterior = $<HTMLButtonElement>("btn-anterior");
 const btnSiguiente = $<HTMLButtonElement>("btn-siguiente");
 const mensaje = $<HTMLDivElement>("mensaje");
+const selFiltroCliente = $<HTMLSelectElement>("filtro-cliente");
+
+/** Llena el desplegable de clientes del filtro (asi no hay que escribir la razon social). */
+async function cargarClientesFiltro() {
+  try {
+    const clientes = (await todosLosClientes()).contenido;
+    selFiltroCliente.innerHTML = `<option value="">Todos</option>` +
+      clientes.map((c) => `<option value="${html(c.razonSocial)}">${html(c.razonSocial)}</option>`).join("");
+  } catch {
+    // si falla, el filtro queda solo con "Todos"; la grilla muestra el error de conexion
+  }
+}
+
+// Elegir un cliente filtra en el momento, sin tener que tocar "Buscar"
+selFiltroCliente.addEventListener("change", () => formFiltros.requestSubmit());
 
 // ---------- 1. Cargar la grilla ----------
 
@@ -37,7 +52,8 @@ function filaHtml(f: FacturaResumen): string {
     ? `<span class="chip ok">Informada</span>`
     : `<span class="chip pendiente">Pendiente</span>`;
   const acciones = f.informadaArca
-    ? `<a class="btn chico" href="factura.html?id=${f.id}">Ver</a>`
+    ? `<a class="btn chico" href="factura.html?id=${f.id}">Ver</a>
+       <a class="btn chico" href="${urlTicketPdf(f.id)}" target="_blank" rel="noopener">🖨 Ticket PDF</a>`
     : `<a class="btn chico" href="factura.html?id=${f.id}">Editar</a>
        <button class="btn chico primario" data-informar="${f.id}">Informar a ARCA</button>
        <button class="btn chico peligro" data-eliminar="${f.id}">Eliminar</button>`;
@@ -137,3 +153,4 @@ async function mostrarModoArca() {
 
 mostrarModoArca();
 cargarGrilla();
+cargarClientesFiltro();

@@ -41,7 +41,7 @@ export function abrirExplorador<T>(opciones: OpcionesExplorador<T>): Promise<T |
       <span data-info></span>
       <button type="button" class="btn" data-siguiente>Siguiente ›</button>
     </footer>
-    <p class="ayuda">Doble clic (o Enter) sobre una fila para elegirla.</p>`;
+    <p class="ayuda">Clic (o Enter) sobre una fila para elegirla.</p>`;
   document.body.appendChild(dialogo);
 
   const input = dialogo.querySelector("input")!;
@@ -98,7 +98,7 @@ export function abrirExplorador<T>(opciones: OpcionesExplorador<T>): Promise<T |
     input.addEventListener("keydown", (e) => {
       if (e.key === "ArrowDown") cuerpo.querySelector<HTMLElement>("tr[data-i]")?.focus();
     });
-    cuerpo.addEventListener("dblclick", (e) => {
+    cuerpo.addEventListener("click", (e) => {
       const fila = filaElegida(e);
       if (fila) terminar(fila);
     });

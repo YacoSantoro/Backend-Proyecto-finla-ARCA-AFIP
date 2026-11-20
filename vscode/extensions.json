@@ -1,0 +1,7 @@
+{
+  // VS Code te va a ofrecer instalarlas todas con un clic ("Instalar")
+  "recommendations": [
+    "vscjava.vscode-java-pack",
+    "vmware.vscode-boot-dev-pack"
+  ]
+}

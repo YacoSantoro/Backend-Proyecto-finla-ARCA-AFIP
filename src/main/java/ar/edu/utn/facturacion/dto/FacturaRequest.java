@@ -3,6 +3,7 @@ package ar.edu.utn.facturacion.dto;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.Positive;
 
 import java.math.BigDecimal;
@@ -19,6 +20,7 @@ public record FacturaRequest(
 
     public record Item(
             @NotNull(message = "Falta el articulo") Long articuloId,
-            @NotNull @Positive(message = "La cantidad tiene que ser mayor a 0") BigDecimal cantidad) {
+            @NotNull @Positive(message = "La cantidad tiene que ser mayor a 0")
+            @Digits(integer = 9, fraction = 0, message = "La cantidad tiene que ser un numero entero") BigDecimal cantidad) {
     }
 }

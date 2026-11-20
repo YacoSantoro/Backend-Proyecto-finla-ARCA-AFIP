@@ -3,8 +3,8 @@
 // factura.html?id=5   -> editar (o solo ver, si ya esta informada)
 
 import {
-  actualizarFactura, buscarArticulos, buscarClientes, Cliente, crearFactura, Factura,
-  FacturaRequest, informarFactura, listasDePrecio, obtenerFactura, PrecioArticulo,
+  actualizarFactura, buscarArticulos, buscarClientes, Cliente, crearFactura, Factura, todosLosClientes,
+  FacturaRequest, informarFactura, listasDePrecio, obtenerFactura, PrecioArticulo, urlTicketPdf,
 } from "./api.js";
 import { abrirExplorador } from "./explorador.js";
 import { $, condicionIva, dinero, documento, fecha, html, nroComprobante, tipoComprobante } from "./formato.js";
@@ -24,13 +24,14 @@ let facturaId: number | null = null;
 let cliente: Cliente | null = null;
 let renglones: Renglon[] = [];
 let bloqueada = false;
+let clientes: Cliente[] = [];
 
 // ---------- Elementos del HTML ----------
 const titulo = $<HTMLHeadingElement>("titulo");
 const form = $<HTMLFormElement>("form-factura");
 const selTipo = $<HTMLSelectElement>("tipo");
 const inpFecha = $<HTMLInputElement>("fecha");
-const txtCliente = $<HTMLInputElement>("cliente-texto");
+const selCliente = $<HTMLSelectElement>("cliente-select");
 const detalleCliente = $<HTMLParagraphElement>("cliente-detalle");
 const btnBuscarCliente = $<HTMLButtonElement>("btn-buscar-cliente");
 const selLista = $<HTMLSelectElement>("lista");
@@ -39,6 +40,7 @@ const cuerpoItems = $<HTMLTableSectionElement>("items-cuerpo");
 const lblTotal = $<HTMLElement>("total");
 const btnGuardar = $<HTMLButtonElement>("btn-guardar");
 const btnInformar = $<HTMLButtonElement>("btn-informar");
+const btnTicket = $<HTMLAnchorElement>("btn-ticket");
 const panelArca = $<HTMLDivElement>("panel-arca");
 const mensaje = $<HTMLDivElement>("mensaje");
 
@@ -49,12 +51,19 @@ async function iniciar() {
   const listas = await listasDePrecio();
   selLista.innerHTML = listas.map((l) => `<option value="${l.id}">${html(l.nombre)}</option>`).join("");
 
-  // 2) Si viene ?id= en la URL, cargamos esa factura
+  // 2) Llenar el desplegable de clientes (asi no hace falta buscarlos escribiendo)
+  clientes = (await todosLosClientes()).contenido;
+  dibujarOpcionesCliente();
+
+  // 3) Si viene ?id= en la URL, cargamos esa factura
   const id = new URLSearchParams(location.search).get("id");
   if (id) {
     mostrarFactura(await obtenerFactura(Number(id)));
   } else {
     inpFecha.value = hoy();
+    // Factura nueva: arranca como Consumidor Final, el caso mas comun en mostrador
+    const consumidorFinal = clientes.find((c) => c.docTipo === 99) ?? clientes.find((c) => c.condicionIva === 5);
+    if (consumidorFinal) elegirCliente(consumidorFinal);
     dibujarRenglones();
   }
 }
@@ -80,6 +89,9 @@ function mostrarFactura(f: Factura) {
 
   titulo.textContent = `${tipoComprobante(f.tipoComprobante)} ${nroComprobante(f.puntoVenta, f.numero)}`;
   btnInformar.hidden = bloqueada;
+  // El ticket solo existe cuando ARCA ya dio el CAE
+  btnTicket.hidden = !f.informadaArca;
+  btnTicket.href = f.informadaArca ? urlTicketPdf(f.id) : "#";
   mostrarPanelArca(f);
   aplicarBloqueo();
   dibujarRenglones();
@@ -116,11 +128,31 @@ function mostrarPanelArca(f: Factura) {
 
 // ---------- Cliente (explorer) ----------
 
+function dibujarOpcionesCliente() {
+  selCliente.innerHTML = `<option value="">— Elegí un cliente —</option>` +
+    clientes.map((c) => `<option value="${c.id}">${html(c.razonSocial)} · ${html(documento(c.docTipo, c.docNro))}</option>`).join("");
+}
+
 function elegirCliente(c: Cliente) {
+  // Si vino del buscador y no estaba en el desplegable, lo agregamos
+  if (!clientes.some((x) => x.id === c.id)) {
+    clientes.push(c);
+    dibujarOpcionesCliente();
+  }
   cliente = c;
-  txtCliente.value = c.razonSocial;
+  selCliente.value = String(c.id);
   detalleCliente.textContent = `${documento(c.docTipo, c.docNro)} · ${condicionIva(c.condicionIva)}`;
 }
+
+selCliente.addEventListener("change", () => {
+  const c = clientes.find((x) => String(x.id) === selCliente.value);
+  if (c) {
+    elegirCliente(c);
+  } else {
+    cliente = null;
+    detalleCliente.textContent = "";
+  }
+});
 
 btnBuscarCliente.addEventListener("click", async () => {
   const elegido = await abrirExplorador<Cliente>({
@@ -184,7 +216,7 @@ function dibujarRenglones() {
       <tr>
         <td class="mono">${html(r.codigo)}</td>
         <td>${html(r.descripcion)}</td>
-        <td><input type="number" min="0.001" step="any" value="${r.cantidad}" data-cantidad="${i}" ${bloqueada ? "disabled" : ""}></td>
+        <td><input type="number" min="1" step="1" inputmode="numeric" value="${r.cantidad}" data-cantidad="${i}" ${bloqueada ? "disabled" : ""}></td>
         <td class="der">${html(dinero(r.precio))}</td>
         <td class="der">${r.alicuotaIva}%</td>
         <td class="der">${html(dinero(r.precio * r.cantidad))}</td>
@@ -198,7 +230,9 @@ function dibujarRenglones() {
 cuerpoItems.addEventListener("change", (e) => {
   const input = e.target as HTMLInputElement;
   if (input.dataset.cantidad === undefined) return;
-  renglones[Number(input.dataset.cantidad)].cantidad = Number(input.value);
+  // Solo enteros: si escriben 2,5 o 0 lo llevamos al entero valido mas cercano (minimo 1)
+  const valor = Math.max(1, Math.round(Number(input.value) || 1));
+  renglones[Number(input.dataset.cantidad)].cantidad = valor;
   dibujarRenglones();
 });
 
@@ -213,9 +247,9 @@ cuerpoItems.addEventListener("click", (e) => {
 
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
-  if (!cliente) return mostrarMensaje("Elegí un cliente con el botón Buscar.", "error");
+  if (!cliente) return mostrarMensaje("Elegí un cliente de la lista.", "error");
   if (!renglones.length) return mostrarMensaje("Agregá al menos un artículo.", "error");
-  if (renglones.some((r) => !(r.cantidad > 0))) return mostrarMensaje("Todas las cantidades tienen que ser mayores a 0.", "error");
+  if (renglones.some((r) => !Number.isInteger(r.cantidad) || r.cantidad < 1)) return mostrarMensaje("Las cantidades tienen que ser números enteros mayores a 0.", "error");
 
   const datos: FacturaRequest = {
     clienteId: cliente.id,

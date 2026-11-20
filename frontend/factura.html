@@ -30,7 +30,7 @@
         </label>
         <label class="ancho">Cliente
           <span class="con-boton">
-            <input id="cliente-texto" type="text" readonly placeholder="Elegí un cliente →">
+            <select id="cliente-select" aria-label="Cliente"></select>
             <button id="btn-buscar-cliente" class="btn" type="button">Buscar…</button>
           </span>
           <small id="cliente-detalle" class="ayuda"></small>
@@ -60,6 +60,7 @@
       </section>
 
       <div class="botones fin">
+        <a id="btn-ticket" class="btn" href="#" target="_blank" rel="noopener" hidden>🖨 Imprimir ticket (PDF)</a>
         <button id="btn-informar" class="btn" type="button" hidden>Informar a ARCA</button>
         <button id="btn-guardar" class="btn primario" type="submit">Guardar</button>
       </div>

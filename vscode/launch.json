@@ -1,0 +1,14 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "java",
+      "name": "Backend (Spring Boot)",
+      "request": "launch",
+      "mainClass": "ar.edu.utn.facturacion.FacturacionApplication",
+      "projectName": "facturacion-arca",
+      // Importante: las rutas de certificados/ y data/ son relativas a la raiz
+      "cwd": "${workspaceFolder}"
+    }
+  ]
+}

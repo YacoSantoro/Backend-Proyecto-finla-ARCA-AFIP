@@ -5,12 +5,17 @@ import ar.edu.utn.facturacion.dto.FacturaRequest;
 import ar.edu.utn.facturacion.dto.FacturaResumenDto;
 import ar.edu.utn.facturacion.dto.FiltroFactura;
 import ar.edu.utn.facturacion.dto.PaginaDto;
+import ar.edu.utn.facturacion.pdf.TicketPdfService;
 import ar.edu.utn.facturacion.service.FacturaService;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.ContentDisposition;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -23,15 +28,18 @@ import java.time.LocalDate;
  *   PUT    /api/facturas/{id}         -> modificar (si no esta informada)
  *   DELETE /api/facturas/{id}         -> borrar   (si no esta informada)
  *   POST   /api/facturas/{id}/informar -> mandarla a ARCA
+ *   GET    /api/facturas/{id}/ticket   -> ticket PDF para imprimir (solo informadas)
  */
 @RestController
 @RequestMapping("/api/facturas")
 public class FacturaController {
 
     private final FacturaService facturaService;
+    private final TicketPdfService ticketPdfService;
 
-    public FacturaController(FacturaService facturaService) {
+    public FacturaController(FacturaService facturaService, TicketPdfService ticketPdfService) {
         this.facturaService = facturaService;
+        this.ticketPdfService = ticketPdfService;
     }
 
     @GetMapping
@@ -73,5 +81,16 @@ public class FacturaController {
     @PostMapping("/{id}/informar")
     public FacturaDto informar(@PathVariable Long id) {
         return facturaService.informar(id);
+    }
+
+    /** Devuelve el PDF "inline": el navegador lo abre en una pestaña y desde ahi se imprime. */
+    @GetMapping("/{id}/ticket")
+    public ResponseEntity<byte[]> ticket(@PathVariable Long id) {
+        byte[] pdf = ticketPdfService.generar(id);
+        String nombre = ticketPdfService.nombreArchivo(id) + ".pdf";
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_PDF)
+                .header(HttpHeaders.CONTENT_DISPOSITION, ContentDisposition.inline().filename(nombre).build().toString())
+                .body(pdf);
     }
 }

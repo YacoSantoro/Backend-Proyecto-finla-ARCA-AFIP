@@ -1,0 +1,11 @@
+{
+  // Usa el mvnw.cmd del proyecto (no hace falta tener Maven instalado)
+  "maven.executable.preferMavenWrapper": true,
+  "java.configuration.updateBuildConfiguration": "automatic",
+  // TypeScript del frontend
+  "typescript.tsdk": "frontend/node_modules/typescript/lib",
+  "files.exclude": {
+    "**/target": true,
+    "frontend/node_modules": true
+  }
+}
